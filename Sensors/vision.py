@@ -9,17 +9,19 @@ class VisionProcessor:
         self._init_camera()
 
     def _init_camera(self):
-        """Подключение к камере по умолчанию"""
+        """Инициализация камеры с обработкой ошибок"""
         try:
             self.camera = cv2.VideoCapture(0)
             if not self.camera.isOpened():
-                raise RuntimeError("Камера не обнаружена")
+                raise RuntimeError("Камера недоступна")
+            print("📷 Камера активирована")
         except Exception as e:
-            print(f"🚨 Ошибка инициализации зрения: {str(e)}")
+            print(f"🚨 Ошибка камеры: {str(e)}")
+            self.camera = None
 
     def capture_frame(self) -> Optional[np.ndarray]:
-        """Захват кадра в режиме реального времени"""
-        if not self.camera or not self.camera.isOpened():
+        """Захват кадра с камеры"""
+        if not self.camera:
             return None
 
         ret, frame = self.camera.read()
@@ -66,6 +68,9 @@ class VisionProcessor:
     #    self.last_frame = cv2.imread(path)
     #    return self.last_frame
 
-    def capture_test_image(self):
-        self.last_frame = cv2.imread("test_image.jpg")
+    def capture_test_image(self, image_path: str) -> Optional[np.ndarray]:
+        """Загружает тестовое изображение из файла"""
+        self.last_frame = cv2.imread(image_path)
+        if self.last_frame is None:
+            print(f"🚨 Не удалось загрузить изображение: {image_path}")
         return self.last_frame

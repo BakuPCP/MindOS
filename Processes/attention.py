@@ -40,3 +40,10 @@ class AttentionController:
 
     def get_current_focus(self):
         return self.current_focus
+
+    def handle_visual_input(self, objects: list):
+        """Обработка визуальных стимулов"""
+        if "person" in objects:
+            self.add_task("human_detected", TaskPriority.HIGH, {"type": "social_interaction"})
+        if "car" in objects:
+            self.add_task("vehicle_nearby", TaskPriority.CRITICAL, {"risk_level": 0.8})

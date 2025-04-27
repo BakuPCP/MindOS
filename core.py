@@ -41,14 +41,19 @@ class MindCore:
         print(f"Текущий фокус: {current_task['id']}")
 
         # Тест захвата кадра
-        test_frame = self.vision.capture_test_image()
-        #test_frame = self.vision.capture_frame()
+        #test_frame = self.vision.capture_test_image("test_image.jpg")
+        test_frame = self.vision.capture_frame()
         if test_frame is not None:
-            print("👁️ Визуальный сенсор: кадр захвачен")
-            processed = self.vision.preprocess(test_frame)
-            cv2.imwrite("test_frame.jpg", processed)
-        else:
-            print("👁️ Визуальный сенсор: нет данных")
+            # Сохраняем сырой кадр
+            cv2.imwrite("raw_camera_frame.jpg", test_frame)
+
+            # Анализ объектов
+            analysis = self.recognizer.analyze_frame(test_frame)
+            print(f"🔍 Обнаружено: {analysis.get('count', 0)} объектов")
+
+            # Визуализация результатов
+            visualized = self.recognizer.visualize_detection(test_frame.copy(), analysis)
+            cv2.imwrite("detection_result.jpg", visualized)
 
         if test_frame is not None:
             analysis = self.recognizer.analyze_frame(test_frame)
