@@ -7,11 +7,13 @@ class TaskPriority(Enum):
     HIGH = 3        # Речь, визуальные стимулы
     MEDIUM = 2      # Фоновые процессы
     LOW = 1         # Воспоминания
+    SPEECH = 3
 
 
 class AttentionController:
-    def __init__(self):
-        self.active_tasks: List[Dict] = []
+    def __init__(self, mind_core):
+        self.mind = mind_core
+        self.active_tasks = []
         self.current_focus = None
 
     def add_task(self, task_id: str, priority: TaskPriority, context: dict):
@@ -24,15 +26,13 @@ class AttentionController:
         self._reprioritize()
 
     def switch_focus(self):
-        """Переключить фокус на задачу с наивысшим приоритетом"""
-        if not self.active_tasks:
-            self.current_focus = None
-            return
 
-        # Выбор задачи по приоритету (FIFO для одинаковых приоритетов)
-        self.active_tasks.sort(key=lambda x: x['priority'].value, reverse=True)
-        self.current_focus = self.active_tasks.pop(0)
-        return self.current_focus
+        task = self.active_tasks.pop(0) if self.active_tasks else None
+        if task:
+            self.current_focus = task
+            # Передаем контекст в эмоциональный движок
+            self.mind.emotion_engine.evaluate_event(task["context"])
+        return task
 
     def _reprioritize(self):
         """Динамическое изменение приоритетов (заглушка для будущей логики)"""
